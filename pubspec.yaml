@@ -10,7 +10,7 @@ dependencies:
   path: ^1.7.0
   args: ^1.6.0
   file:
-  xml:
+  xml: ^4.4.0
   pubspec_parse:
 
 dev_dependencies:

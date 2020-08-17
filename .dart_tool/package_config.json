@@ -339,7 +339,7 @@
     },
     {
       "name": "xml",
-      "rootUri": "file:///C:/Users/Goldy/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/xml-4.3.0",
+      "rootUri": "file:///C:/Users/Goldy/AppData/Roaming/Pub/Cache/hosted/pub.dartlang.org/xml-4.4.0",
       "packageUri": "lib/",
       "languageVersion": "2.7"
     },
@@ -356,7 +356,7 @@
       "languageVersion": "2.8"
     }
   ],
-  "generated": "2020-08-13T20:37:37.616793Z",
+  "generated": "2020-08-17T14:25:31.057447Z",
   "generator": "pub",
-  "generatorVersion": "2.9.0"
+  "generatorVersion": "2.9.1"
 }

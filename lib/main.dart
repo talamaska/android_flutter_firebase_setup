@@ -9,9 +9,8 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 
 ArgResults argResults;
 
-void printHello(List<String> arguments) {
-  final ArgParser argParser = new ArgParser()
-    ..addOption('path', abbr: 'p', defaultsTo: '.');
+void main(List<String> arguments) {
+  final argParser = ArgParser()..addOption('path', abbr: 'p', defaultsTo: '.');
 
   argResults = argParser.parse(arguments);
 
@@ -61,12 +60,22 @@ void getManifestContent(String path, bool hasFirebaseMessages) {
         .first
         .findAllElements('application')
         .first
-        .findElements('activity')
+        .findAllElements('activity')
         .first
         .children
         .add(buildIntentXML().firstChild.copy());
   }
-  manifest.writeAsString(document.toXmlString(pretty: true));
+  manifest.writeAsString(document.toXmlString(
+    pretty: true,
+    preserveWhitespace: (value) {
+      print('value $value');
+      return true;
+    },
+    indentAttribute: (node) {
+      print('attr ${node}');
+      return true;
+    },
+  ));
 }
 
 void getRootGradleContent(
@@ -100,8 +109,7 @@ void getRootGradleContent(
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
         print('tabs ${tabs.length}');
-        var spacer = List.generate(
-            (tabs.isNotEmpty ? tabs.length : 2) * 2, (index) => ' ').join();
+        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
 
         newLines
             .add("${spacer}classpath 'com.google.gms:google-services:4.3.2'");
@@ -157,9 +165,8 @@ void getAppGradleContent(
       if (inAndroid && inConfig && line.contains('}')) {
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
-        print('tabs ${tabs.length}');
-        var spacer = List.generate(
-            (tabs.isNotEmpty ? tabs.length : 2) * 2, (index) => ' ').join();
+        // print('tabs ${tabs.length}');
+        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
         newLines.add('${spacer}multiDexEnabled true');
         inAndroid = false;
         inConfig = false;
@@ -170,9 +177,8 @@ void getAppGradleContent(
       if (inDeps && line.contains('}')) {
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
-        print('tabs ${tabs.length}');
-        var spacer = List.generate(
-            (tabs.isNotEmpty ? tabs.length : 2) * 2, (index) => ' ').join();
+        // print('tabs ${tabs.length}');
+        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
         newLines.add(
             "${spacer}implementation 'com.google.firebase:firebase-messaging:20.2.4'");
 
@@ -187,7 +193,7 @@ void getAppGradleContent(
     newLines.add("apply plugin: 'com.google.gms.google-serices'");
   }
 
-  if (!hasSubprojects) {
+  if (!hasSubprojects && hasFirebase) {
     newLines.add('');
     newLines.add('''subprojects {
     project.configurations.all {
@@ -226,7 +232,8 @@ Directory getAndroidPath(Directory fs) {
 
 File getRootGradle(String projectPath) {
   var fs = const LocalFileSystem();
-  return fs.currentDirectory
+  return fs
+      .directory(p.absolute(projectPath))
       .childDirectory('android')
       .childFile('build.gradle');
 }
@@ -234,7 +241,7 @@ File getRootGradle(String projectPath) {
 File getAppGradle(String projectPath) {
   var fs = const LocalFileSystem();
   return fs
-      .directory(projectPath)
+      .directory(p.absolute(projectPath))
       .childDirectory('android')
       .childDirectory('app')
       .childFile('build.gradle');
@@ -243,7 +250,7 @@ File getAppGradle(String projectPath) {
 File getManifest(String projectPath) {
   var fs = const LocalFileSystem();
   return fs
-      .directory(projectPath)
+      .directory(p.absolute(projectPath))
       .childDirectory('android')
       .childDirectory('app')
       .childDirectory('src')
