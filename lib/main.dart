@@ -45,7 +45,6 @@ XmlDocument buildIntentXML() {
 void getManifestContent(String path, bool hasFirebaseMessages) {
   var manifest = getManifest(path);
   var content = manifest.readAsStringSync();
-  // print('content $content');
   final document = XmlDocument.parse(content);
   var hasNotification = document
       .findAllElements('action')
@@ -65,17 +64,32 @@ void getManifestContent(String path, bool hasFirebaseMessages) {
         .children
         .add(buildIntentXML().firstChild.copy());
   }
-  manifest.writeAsString(document.toXmlString(
+  var xmlString = document.toXmlString(
     pretty: true,
-    preserveWhitespace: (value) {
-      print('value $value');
-      return true;
-    },
+    indent: '    ',
     indentAttribute: (node) {
       print('attr ${node}');
-      return true;
+      var length = node.parent.attributes.length;
+      // var index = node.parent.attributes.indexOf(node);
+      return !node.name.toString().contains('xmlns') && length > 1;
     },
-  ));
+  );
+
+  print('xmlString $xmlString');
+
+  manifest.writeAsString(xmlString);
+  // const input = '<body a="1" b="2">'
+  //     '<a a="1">AAA</a>'
+  //     '<b a="1" b="2"><c a="1" b="2" c="3">CCC</c></b>'
+  //     '<c a="1" b="2" c="3">CCC</c>'
+  //     '</body>';
+  // final document2 = XmlDocument.parse(input);
+
+  // final output = document2.toXmlString(
+  //   pretty: true,
+  //   indentAttribute: (node) => true,
+  // );
+  // print('$output');
 }
 
 void getRootGradleContent(
