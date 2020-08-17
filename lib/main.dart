@@ -8,6 +8,8 @@ import 'package:pubspec_parse/pubspec_parse.dart';
 
 ArgResults argResults;
 
+const GRADLE_INDENT = 4;
+
 void main(List<String> arguments) {
   final argParser = ArgParser()..addOption('path', abbr: 'p', defaultsTo: '.');
 
@@ -106,8 +108,8 @@ void getRootGradleContent(
       if (inBuildscript && inDeps && line.contains('}')) {
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
-        print('tabs ${tabs.length}');
-        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
+
+        var spacer = ' ' * (tabs.isNotEmpty ? tabs.length * 2 : GRADLE_INDENT);
 
         newLines
             .add("${spacer}classpath 'com.google.gms:google-services:4.3.2'");
@@ -164,7 +166,7 @@ void getAppGradleContent(
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
         // print('tabs ${tabs.length}');
-        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
+        var spacer = ' ' * (tabs.isNotEmpty ? tabs.length * 2 : GRADLE_INDENT);
         newLines.add('${spacer}multiDexEnabled true');
         inAndroid = false;
         inConfig = false;
@@ -176,7 +178,7 @@ void getAppGradleContent(
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
         // print('tabs ${tabs.length}');
-        var spacer = ' ' * ((tabs.isNotEmpty ? tabs.length : 2) * 2);
+        var spacer = ' ' * (tabs.isNotEmpty ? tabs.length * 2 : GRADLE_INDENT);
         newLines.add(
             "${spacer}implementation 'com.google.firebase:firebase-messaging:20.2.4'");
 
