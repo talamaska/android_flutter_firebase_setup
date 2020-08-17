@@ -139,7 +139,7 @@ void getAppGradleContent(
   var newLines = [];
 
   for (var line in lines) {
-    if (line.contains(r'dependencies')) {
+    if (line.contains('dependencies {')) {
       inDeps = true;
     }
     if (line.contains('android {')) {
@@ -206,15 +206,10 @@ void getAppGradleContent(
     }
 }''');
   }
+  newLines.add('');
 
   appGradle.writeAsStringSync(newLines.join('\n'));
 }
-
-// String _getFile(String filePathAndName) {
-//   final file = File.fromUri(Uri.file(filePathAndName, windows: true));
-//   final fileData = file.readAsStringSync();
-//   return fileData;
-// }
 
 Pubspec getPubspec(String projectPath) {
   var fs = const LocalFileSystem();
