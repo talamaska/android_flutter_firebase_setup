@@ -3,7 +3,6 @@ import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'dart:io';
 import 'package:path/path.dart' as p;
-
 import 'package:xml/xml.dart';
 import 'package:pubspec_parse/pubspec_parse.dart';
 
@@ -16,7 +15,6 @@ void main(List<String> arguments) {
 
   final String path = argResults['path'];
 
-  print('path: $path');
   var pubspec = getPubspec(path);
   var hasFirebase = pubspec.dependencies.entries
       .where((element) => element.toString().contains('firebase'))
@@ -24,7 +22,8 @@ void main(List<String> arguments) {
   var hasFirebaseMessages = pubspec.dependencies.entries
       .where((element) => element.toString().contains('firebase_messaging'))
       .isNotEmpty;
-  getRootGradleContent(path, hasFirebaseMessages);
+
+  getRootGradleContent(path, hasFirebase, hasFirebaseMessages);
   getAppGradleContent(path, hasFirebase, hasFirebaseMessages);
   getManifestContent(path, hasFirebaseMessages);
 }
@@ -68,32 +67,17 @@ void getManifestContent(String path, bool hasFirebaseMessages) {
     pretty: true,
     indent: '    ',
     indentAttribute: (node) {
-      print('attr ${node}');
       var length = node.parent.attributes.length;
-      // var index = node.parent.attributes.indexOf(node);
       return !node.name.toString().contains('xmlns') && length > 1;
     },
   );
 
-  print('xmlString $xmlString');
-
   manifest.writeAsString(xmlString);
-  // const input = '<body a="1" b="2">'
-  //     '<a a="1">AAA</a>'
-  //     '<b a="1" b="2"><c a="1" b="2" c="3">CCC</c></b>'
-  //     '<c a="1" b="2" c="3">CCC</c>'
-  //     '</body>';
-  // final document2 = XmlDocument.parse(input);
-
-  // final output = document2.toXmlString(
-  //   pretty: true,
-  //   indentAttribute: (node) => true,
-  // );
-  // print('$output');
 }
 
 void getRootGradleContent(
   String path,
+  bool hasFirebase,
   bool hasFirebaseMessages,
 ) {
   var rootGradle = getRootGradle(path);
@@ -118,7 +102,7 @@ void getRootGradleContent(
     }
     // print('inBuild $inBuildscript, inDeps $inDeps');
 
-    if (hasFirebaseMessages && !hasGMSServies) {
+    if (hasFirebase && !hasGMSServies) {
       if (inBuildscript && inDeps && line.contains('}')) {
         var re = RegExp(r'(\s)', caseSensitive: false);
         var tabs = re.allMatches(line);
